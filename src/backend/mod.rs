@@ -1,29 +1,96 @@
-//! # Backend-related traits and implementations
+//! # EVM backends
 //!
-//! A backend exposes external information that is available to an EVM
-//! interpreter. This includes block information such as the current coinbase,
-//! block gas limit, etc, as well as the state such as account balance, storage
-//! and code.
-//!
-//! Backends have layers, representing information that may be committed or
-//! discard after the current call stack finishes. Due to the vast differences of
-//! how different backends behave (for example, in some backends like wasm,
-//! pushing/poping layers are dealt by extern functions), layers are handled
-//! internally inside a backend.
+//! Backends store state information of the VM, and exposes it to runtime.
 
-mod overlayed;
+mod memory;
 
-pub use self::overlayed::{OverlayedBackend, OverlayedChangeSet};
-pub use evm_interpreter::{RuntimeBackend, RuntimeBaseBackend, RuntimeEnvironment};
+pub use self::memory::{MemoryAccount, MemoryBackend, MemoryVicinity};
+use alloc::vec::Vec;
+use primitive_types::{H160, H256, U256};
+/// Basic account information.
+#[derive(Clone, Eq, PartialEq, Debug, Default)]
+#[cfg_attr(
+	feature = "with-codec",
+	derive(scale_codec::Encode, scale_codec::Decode, scale_info::TypeInfo)
+)]
+#[cfg_attr(feature = "with-serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct Basic {
+	/// Account balance.
+	pub balance: U256,
+	/// Account nonce.
+	pub nonce: U256,
+}
 
-/// Backend with layers that can transactionally be committed or discarded.
-pub trait TransactionalBackend {
-	/// Push a new substate layer into the backend.
-	fn push_substate(&mut self);
-	/// Pop the last substate layer from the backend, either committing or
-	/// discarding it.
-	///
-	/// The caller is expected to maintain balance of push/pop, and the backend
-	/// are free to panic if it does not.
-	fn pop_substate(&mut self, strategy: crate::MergeStrategy);
+pub use ethereum::Log;
+
+/// Apply state operation.
+#[derive(Clone, Debug)]
+pub enum Apply<I> {
+	/// Modify or create at address.
+	Modify {
+		/// Address.
+		address: H160,
+		/// Basic information of the address.
+		basic: Basic,
+		/// Code. `None` means leaving it unchanged.
+		code: Option<Vec<u8>>,
+		/// Storage iterator.
+		storage: I,
+		/// Whether storage should be wiped empty before applying the storage
+		/// iterator.
+		reset_storage: bool,
+	},
+	/// Delete address.
+	Delete {
+		/// Address.
+		address: H160,
+	},
+}
+
+/// EVM backend.
+#[auto_impl::auto_impl(&, Arc, Box)]
+pub trait Backend {
+	/// Gas price. Unused for London.
+	fn gas_price(&self) -> U256;
+	/// Origin.
+	fn origin(&self) -> H160;
+	/// Environmental block hash.
+	fn block_hash(&self, number: U256) -> H256;
+	/// Environmental block number.
+	fn block_number(&self) -> U256;
+	/// Environmental coinbase.
+	fn block_coinbase(&self) -> H160;
+	/// Environmental block timestamp.
+	fn block_timestamp(&self) -> U256;
+	/// Environmental block difficulty.
+	fn block_difficulty(&self) -> U256;
+	/// Get environmental block randomness.
+	fn block_randomness(&self) -> Option<H256>;
+	/// Environmental block gas limit.
+	fn block_gas_limit(&self) -> U256;
+	/// Environmental block base fee.
+	fn block_base_fee_per_gas(&self) -> U256;
+	/// Environmental chain ID.
+	fn chain_id(&self) -> U256;
+
+	/// Whether account at address exists.
+	fn exists(&self, address: H160) -> bool;
+	/// Get basic account information.
+	fn basic(&self, address: H160) -> Basic;
+	/// Get account code.
+	fn code(&self, address: H160) -> Vec<u8>;
+	/// Get storage value of address at index.
+	fn storage(&self, address: H160, index: H256) -> H256;
+	/// Get original storage value of address at index, if available.
+	fn original_storage(&self, address: H160, index: H256) -> Option<H256>;
+}
+
+/// EVM backend that can apply changes.
+pub trait ApplyBackend {
+	/// Apply given values and logs at backend.
+	fn apply<A, I, L>(&mut self, values: A, logs: L, delete_empty: bool)
+	where
+		A: IntoIterator<Item = Apply<I>>,
+		I: IntoIterator<Item = (H256, H256)>,
+		L: IntoIterator<Item = Log>;
 }

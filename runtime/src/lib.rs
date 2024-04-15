@@ -1,3 +1,192 @@
+//! Runtime layer for EVM.
+
+#![deny(warnings)]
+#![forbid(unsafe_code, unused_variables)]
+#![cfg_attr(not(feature = "std"), no_std)]
+
+extern crate alloc;
+
+#[cfg(feature = "tracing")]
+pub mod tracing;
+
+#[cfg(feature = "tracing")]
+macro_rules! event {
+	($x:expr) => {
+		use crate::tracing::Event::*;
+		crate::tracing::with(|listener| listener.event($x));
+	};
+}
+
+#[cfg(not(feature = "tracing"))]
+macro_rules! event {
+	($x:expr) => {};
+}
+
+mod context;
+mod eval;
+mod handler;
+mod interrupt;
+
+pub use evm_core::*;
+
+pub use crate::context::{CallScheme, Context, CreateScheme};
+pub use crate::handler::{Handler, Transfer};
+pub use crate::interrupt::{Resolve, ResolveCall, ResolveCreate};
+
+use alloc::rc::Rc;
+use alloc::vec::Vec;
+use primitive_types::{H160, U256};
+
+macro_rules! step {
+	( $self:expr, $handler:expr, $return:tt $($err:path)?; $($ok:path)? ) => ({
+		if let Some((opcode, stack)) = $self.machine.inspect() {
+			event!(Step {
+				context: &$self.context,
+				opcode,
+				position: $self.machine.position(),
+				stack,
+				memory: $self.machine.memory()
+			});
+
+			match $handler.pre_validate(&$self.context, opcode, stack) {
+				Ok(()) => (),
+				Err(e) => {
+					$self.machine.exit(e.clone().into());
+					$self.status = Err(e.into());
+				},
+			}
+		}
+
+		match &$self.status {
+			Ok(()) => (),
+			Err(e) => {
+				#[allow(unused_parens)]
+				$return $($err)*(Capture::Exit(e.clone()))
+			},
+		}
+
+		let result = $self.machine.step();
+
+		event!(StepResult {
+			result: &result,
+			return_value: &$self.machine.return_value(),
+		});
+
+		match result {
+			Ok(()) => $($ok)?(()),
+			Err(Capture::Exit(e)) => {
+				$self.status = Err(e.clone());
+				#[allow(unused_parens)]
+				$return $($err)*(Capture::Exit(e))
+			},
+			Err(Capture::Trap(opcode)) => {
+				match eval::eval($self, opcode, $handler) {
+					eval::Control::Continue => $($ok)?(()),
+					eval::Control::CallInterrupt(interrupt) => {
+						let resolve = ResolveCall::new($self);
+						#[allow(unused_parens)]
+						$return $($err)*(Capture::Trap(Resolve::Call(interrupt, resolve)))
+					},
+					eval::Control::CreateInterrupt(interrupt) => {
+						let resolve = ResolveCreate::new($self);
+						#[allow(unused_parens)]
+						$return $($err)*(Capture::Trap(Resolve::Create(interrupt, resolve)))
+					},
+					eval::Control::Exit(exit) => {
+						$self.machine.exit(exit.clone().into());
+						$self.status = Err(exit.clone());
+						#[allow(unused_parens)]
+						$return $($err)*(Capture::Exit(exit))
+					},
+				}
+			},
+		}
+	});
+}
+
+/// EVM runtime.
+///
+/// The runtime wraps an EVM `Machine` with support of return data and context.
+pub struct Runtime {
+	machine: Machine,
+	status: Result<(), ExitReason>,
+	return_data_buffer: Vec<u8>,
+	return_data_len: U256,
+	return_data_offset: U256,
+	context: Context,
+}
+
+impl Runtime {
+	/// Create a new runtime with given code and data.
+	pub fn new(
+		code: Rc<Vec<u8>>,
+		data: Rc<Vec<u8>>,
+		context: Context,
+		stack_limit: usize,
+		memory_limit: usize,
+	) -> Self {
+		Self {
+			machine: Machine::new(code, data, stack_limit, memory_limit),
+			status: Ok(()),
+			return_data_buffer: Vec::new(),
+			return_data_len: U256::zero(),
+			return_data_offset: U256::zero(),
+			context,
+		}
+	}
+
+	/// Get a reference to the machine.
+	pub fn machine(&self) -> &Machine {
+		&self.machine
+	}
+
+	/// Get a reference to the execution context.
+	pub fn context(&self) -> &Context {
+		&self.context
+	}
+
+	/// Step the runtime.
+	pub fn step<'a, H: Handler>(
+		&'a mut self,
+		handler: &mut H,
+	) -> Result<(), Capture<ExitReason, Resolve<'a, H>>> {
+		step!(self, handler, return Err; Ok)
+	}
+
+	/// Loop stepping the runtime until it stops.
+	pub fn run<'a, H: Handler>(
+		&'a mut self,
+		handler: &mut H,
+	) -> Capture<ExitReason, Resolve<'a, H>> {
+		loop {
+			step!(self, handler, return;)
+		}
+	}
+
+	pub fn finish_create(
+		&mut self,
+		reason: ExitReason,
+		address: Option<H160>,
+		return_data: Vec<u8>,
+	) -> Result<(), ExitReason> {
+		eval::finish_create(self, reason, address, return_data)
+	}
+
+	pub fn finish_call(
+		&mut self,
+		reason: ExitReason,
+		return_data: Vec<u8>,
+	) -> Result<(), ExitReason> {
+		eval::finish_call(
+			self,
+			self.return_data_len,
+			self.return_data_offset,
+			reason,
+			return_data,
+		)
+	}
+}
+
 /// Runtime configuration.
 #[derive(Clone, Debug)]
 pub struct Config {
@@ -97,6 +286,8 @@ pub struct Config {
 	pub has_base_fee: bool,
 	/// Has PUSH0 opcode. See [EIP-3855](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-3855.md)
 	pub has_push0: bool,
+	/// Whether the gasometer is running in estimate mode.
+	pub estimate: bool,
 }
 
 impl Config {
@@ -150,6 +341,7 @@ impl Config {
 			has_ext_code_hash: false,
 			has_base_fee: false,
 			has_push0: false,
+			estimate: false,
 		}
 	}
 
@@ -203,6 +395,7 @@ impl Config {
 			has_ext_code_hash: true,
 			has_base_fee: false,
 			has_push0: false,
+			estimate: false,
 		}
 	}
 
@@ -299,6 +492,7 @@ impl Config {
 			has_ext_code_hash: true,
 			has_base_fee,
 			has_push0,
+			estimate: false,
 		}
 	}
 }
