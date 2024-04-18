@@ -1,7 +1,5 @@
 extern crate alloc;
 
-mod tracing;
-
 use super::Context;
 use alloc::vec::Vec;
 use ethereum_types::{H160, H256, U256};
@@ -81,11 +79,11 @@ pub enum RuntimeEvent {
 #[cfg(feature = "tracing")]
 impl RuntimeEvent {
 	pub fn from_evm_event<'a>(
-		i: evm_runtime::tracing::Event<'a>,
+		i: crate::tracing::Event<'a>,
 		filter: crate::StepEventFilter,
 	) -> Self {
 		match i {
-			evm_runtime::tracing::Event::Step {
+			crate::tracing::Event::Step {
 				context,
 				opcode,
 				position,
@@ -109,7 +107,7 @@ impl RuntimeEvent {
 					None
 				},
 			},
-			evm_runtime::tracing::Event::StepResult {
+			crate::tracing::Event::StepResult {
 				result,
 				return_value,
 			} => Self::StepResult {
@@ -122,7 +120,7 @@ impl RuntimeEvent {
 				},
 				return_value: return_value.to_vec(),
 			},
-			evm_runtime::tracing::Event::SLoad {
+			crate::tracing::Event::SLoad {
 				address,
 				index,
 				value,
@@ -131,7 +129,7 @@ impl RuntimeEvent {
 				index,
 				value,
 			},
-			evm_runtime::tracing::Event::SStore {
+			crate::tracing::Event::SStore {
 				address,
 				index,
 				value,
