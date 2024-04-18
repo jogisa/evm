@@ -1,5 +1,7 @@
 extern crate alloc;
 
+mod tracing;
+
 use super::Context;
 use alloc::vec::Vec;
 use ethereum_types::{H160, H256, U256};

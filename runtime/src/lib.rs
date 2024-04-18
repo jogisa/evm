@@ -40,6 +40,11 @@ use alloc::rc::Rc;
 use alloc::vec::Vec;
 use primitive_types::{H160, U256};
 
+pub struct StepEventFilter {
+	pub enable_stack: bool,
+	pub enable_memory: bool,
+}
+
 macro_rules! step {
 	( $self:expr, $handler:expr, $return:tt $($err:path)?; $($ok:path)? ) => ({
 		if let Some((opcode, stack)) = $self.machine.inspect() {
