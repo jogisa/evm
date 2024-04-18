@@ -3,7 +3,7 @@ extern crate alloc;
 use super::Context;
 use alloc::vec::Vec;
 use ethereum_types::{H160, H256, U256};
-use crate::{ExitError, ExitReason, ExitSucceed, Opcode};
+use crate::{ExitError, ExitReason, ExitSucceed, Opcode, Stack, Memory, Capture};
 use parity_scale_codec::{Decode, Encode};
 
 #[derive(Clone, Debug, Encode, Decode, PartialEq, Eq)]
@@ -12,8 +12,8 @@ pub struct Stack {
 	pub limit: u64,
 }
 
-impl From<&evm::Stack> for Stack {
-	fn from(i: &evm::Stack) -> Self {
+impl From<&Stack> for Stack {
+	fn from(i: &Stack) -> Self {
 		Self {
 			data: i.data().clone(),
 			limit: i.limit() as u64,
@@ -28,8 +28,8 @@ pub struct Memory {
 	pub limit: u64,
 }
 
-impl From<&evm::Memory> for Memory {
-	fn from(i: &evm::Memory) -> Self {
+impl From<&Memory> for Memory {
+	fn from(i: &Memory) -> Self {
 		Self {
 			data: i.data().clone(),
 			effective_len: i.effective_len(),
