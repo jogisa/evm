@@ -14,6 +14,9 @@ pub use evm_runtime::*;
 pub mod tracing;
 
 #[cfg(feature = "tracing")]
+pub mod events;
+
+#[cfg(feature = "tracing")]
 macro_rules! event {
 	($x:expr) => {
 		use crate::tracing::Event::*;

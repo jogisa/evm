@@ -10,6 +10,9 @@ extern crate alloc;
 pub mod tracing;
 
 #[cfg(feature = "tracing")]
+pub mod events;
+
+#[cfg(feature = "tracing")]
 macro_rules! event {
 	($x:expr) => {
 		use crate::tracing::Event::*;
