@@ -3,7 +3,7 @@ extern crate alloc;
 use super::Context;
 use alloc::vec::Vec;
 use ethereum_types::{H160, H256, U256};
-use crate::{ExitError, ExitReason, ExitSucceed, Opcode, Stack, Memory, Capture};
+use crate::{ExitError, ExitReason, ExitSucceed, Opcode};
 use parity_scale_codec::{Decode, Encode};
 
 #[derive(Clone, Debug, Encode, Decode, PartialEq, Eq)]
@@ -12,8 +12,8 @@ pub struct Stack {
 	pub limit: u64,
 }
 
-impl From<&Stack> for Stack {
-	fn from(i: &Stack) -> Self {
+impl From<&crate::Stack> for Stack {
+	fn from(i: &crate::Stack) -> Self {
 		Self {
 			data: i.data().clone(),
 			limit: i.limit() as u64,
@@ -28,8 +28,8 @@ pub struct Memory {
 	pub limit: u64,
 }
 
-impl From<&Memory> for Memory {
-	fn from(i: &Memory) -> Self {
+impl From<&crate::Memory> for Memory {
+	fn from(i: &crate::Memory) -> Self {
 		Self {
 			data: i.data().clone(),
 			effective_len: i.effective_len(),
@@ -114,8 +114,8 @@ impl RuntimeEvent {
 				result: match result {
 					Ok(_) => Ok(()),
 					Err(capture) => match capture {
-						evm::Capture::Exit(e) => Err(Capture::Exit(e.clone())),
-						evm::Capture::Trap(t) => Err(Capture::Trap(opcodes_string(*t))),
+						crate::Capture::Exit(e) => Err(Capture::Exit(e.clone())),
+						crate::Capture::Trap(t) => Err(Capture::Trap(opcodes_string(*t))),
 					},
 				},
 				return_value: return_value.to_vec(),
