@@ -15,12 +15,15 @@ primitive-types = { version = "0.12", default-features = false }
 sha3 = { version = "0.10", default-features = false }
 
 evm-core = { version = "0.39", path = "../core", default-features = false }
+ethereum-types = { version = "0.14.1", default-features = false }
+scale-codec = { package = "parity-scale-codec", version = "3.2", default-features = false, features = ["derive", "full"], optional = true }
 
 [features]
 default = ["std"]
 std = [
 	"environmental/std",
 	"primitive-types/std",
+	"ethereum-types/std",
 	"sha3/std",
 	"evm-core/std",
 ]

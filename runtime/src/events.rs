@@ -3,7 +3,7 @@ extern crate alloc;
 use super::Context;
 use alloc::vec::Vec;
 use ethereum_types::{H160, H256, U256};
-pub use evm::{ExitError, ExitReason, ExitSucceed, Opcode};
+use crate::{ExitError, ExitReason, ExitSucceed, Opcode};
 use scale_codec::{Decode, Encode};
 
 #[derive(Clone, Debug, Encode, Decode, PartialEq, Eq)]
