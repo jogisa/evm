@@ -57,26 +57,26 @@ pub enum GasometerEvent {
 }
 
 #[cfg(feature = "tracing")]
-impl From<evm_gasometer::tracing::Event> for GasometerEvent {
+impl From<crate::gasometer::tracing::Event> for GasometerEvent {
 	fn from(i: evm_gasometer::tracing::Event) -> Self {
 		match i {
-			evm_gasometer::tracing::Event::RecordCost { cost, snapshot } => Self::RecordCost {
+			crate::gasometer::tracing::Event::RecordCost { cost, snapshot } => Self::RecordCost {
 				cost,
 				snapshot: snapshot.into(),
 			},
-			evm_gasometer::tracing::Event::RecordRefund { refund, snapshot } => {
+			crate::gasometer::tracing::Event::RecordRefund { refund, snapshot } => {
 				Self::RecordRefund {
 					refund,
 					snapshot: snapshot.into(),
 				}
 			}
-			evm_gasometer::tracing::Event::RecordStipend { stipend, snapshot } => {
+			crate::gasometer::tracing::Event::RecordStipend { stipend, snapshot } => {
 				Self::RecordStipend {
 					stipend,
 					snapshot: snapshot.into(),
 				}
 			}
-			evm_gasometer::tracing::Event::RecordDynamicCost {
+			crate::gasometer::tracing::Event::RecordDynamicCost {
 				gas_cost,
 				memory_gas,
 				gas_refund,
@@ -87,7 +87,7 @@ impl From<evm_gasometer::tracing::Event> for GasometerEvent {
 				gas_refund,
 				snapshot: snapshot.into(),
 			},
-			evm_gasometer::tracing::Event::RecordTransaction { cost, snapshot } => {
+			crate::gasometer::tracing::Event::RecordTransaction { cost, snapshot } => {
 				Self::RecordTransaction {
 					cost,
 					snapshot: snapshot.into(),
