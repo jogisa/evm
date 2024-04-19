@@ -1,6 +1,6 @@
 extern crate alloc;
 
-use super::Context;
+use core::Context;
 use alloc::vec::Vec;
 use ethereum_types::{H160, H256, U256};
 use crate::{ExitError, ExitReason, ExitSucceed, Opcode};
