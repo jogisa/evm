@@ -79,11 +79,11 @@ pub enum RuntimeEvent {
 #[cfg(feature = "tracing")]
 impl RuntimeEvent {
 	pub fn from_evm_event<'a>(
-		i: crate::runtime::tracing::Event<'a>,
+		i: crate::Event<'a>,
 		filter: crate::StepEventFilter,
 	) -> Self {
 		match i {
-			crate::runtime::tracing::Event::Step {
+			crate::Event::Step {
 				context,
 				opcode,
 				position,
@@ -107,7 +107,7 @@ impl RuntimeEvent {
 					None
 				},
 			},
-			crate::runtime::tracing::Event::StepResult {
+			crate::Event::StepResult {
 				result,
 				return_value,
 			} => Self::StepResult {
@@ -120,7 +120,7 @@ impl RuntimeEvent {
 				},
 				return_value: return_value.to_vec(),
 			},
-			crate::runtime::tracing::Event::SLoad {
+			crate::Event::SLoad {
 				address,
 				index,
 				value,
@@ -129,7 +129,7 @@ impl RuntimeEvent {
 				index,
 				value,
 			},
-			crate::runtime::tracing::Event::SStore {
+			crate::Event::SStore {
 				address,
 				index,
 				value,

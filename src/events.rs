@@ -123,10 +123,10 @@ pub enum EvmEvent {
 }
 
 #[cfg(feature = "tracing")]
-impl<'a> From<evm::tracing::Event<'a>> for EvmEvent {
-	fn from(i: evm::tracing::Event<'a>) -> Self {
+impl<'a> From<crate::Event<'a>> for EvmEvent {
+	fn from(i: crate::Event<'a>) -> Self {
 		match i {
-			evm::tracing::Event::Call {
+			crate::Event::Call {
 				code_address,
 				transfer,
 				input,
@@ -145,7 +145,7 @@ impl<'a> From<evm::tracing::Event<'a>> for EvmEvent {
 				is_static,
 				context: context.clone().into(),
 			},
-			evm::tracing::Event::Create {
+			crate::Event::Create {
 				caller,
 				address,
 				scheme,
@@ -160,7 +160,7 @@ impl<'a> From<evm::tracing::Event<'a>> for EvmEvent {
 				init_code: init_code.to_vec(),
 				target_gas,
 			},
-			evm::tracing::Event::Suicide {
+			crate::Event::Suicide {
 				address,
 				target,
 				balance,
@@ -169,14 +169,14 @@ impl<'a> From<evm::tracing::Event<'a>> for EvmEvent {
 				target,
 				balance,
 			},
-			evm::tracing::Event::Exit {
+			crate::Event::Exit {
 				reason,
 				return_value,
 			} => Self::Exit {
 				reason: reason.clone(),
 				return_value: return_value.to_vec(),
 			},
-			evm::tracing::Event::TransactCall {
+			crate::Event::TransactCall {
 				caller,
 				address,
 				value,
@@ -189,7 +189,7 @@ impl<'a> From<evm::tracing::Event<'a>> for EvmEvent {
 				data: data.to_vec(),
 				gas_limit,
 			},
-			evm::tracing::Event::TransactCreate {
+			crate::Event::TransactCreate {
 				caller,
 				value,
 				init_code,
@@ -202,7 +202,7 @@ impl<'a> From<evm::tracing::Event<'a>> for EvmEvent {
 				gas_limit,
 				address,
 			},
-			evm::tracing::Event::TransactCreate2 {
+			crate::Event::TransactCreate2 {
 				caller,
 				value,
 				init_code,
@@ -217,7 +217,7 @@ impl<'a> From<evm::tracing::Event<'a>> for EvmEvent {
 				gas_limit,
 				address,
 			},
-			evm::tracing::Event::PrecompileSubcall {
+			crate::Event::PrecompileSubcall {
 				code_address,
 				transfer,
 				input,
