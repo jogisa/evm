@@ -20,7 +20,7 @@ pub struct Context {
 	/// Apparent value of the EVM.
 	pub apparent_value: U256,
 }
-impl From<evm_runtime::Context> for Context {
+impl From<crate::Context> for Context {
 	fn from(i: evm_runtime::Context) -> Self {
 		Self {
 			address: i.address,
