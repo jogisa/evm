@@ -14,6 +14,7 @@ primitive-types = { version = "0.12", default-features = false }
 
 evm-core = { version = "0.39", path = "../core", default-features = false }
 evm-runtime = { version = "0.39", path = "../runtime", default-features = false }
+parity-scale-codec = { version = "3.6.4", default-features = false, features = ["derive"] }
 
 [features]
 default = ["std"]
