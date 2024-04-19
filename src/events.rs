@@ -4,7 +4,7 @@ use alloc::vec::Vec;
 use ethereum_types::{H160, H256, U256};
 use evm_runtime::ExitReason;
 use parity_scale_codec::{Decode, Encode};
-use crate::Context;
+use evm_runtime::events::Context;
 
 #[derive(Clone, Debug, Encode, Decode, PartialEq, Eq)]
 pub struct Transfer {
