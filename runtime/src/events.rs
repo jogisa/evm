@@ -1,6 +1,5 @@
 extern crate alloc;
 
-use core::Context;
 use alloc::vec::Vec;
 use ethereum_types::{H160, H256, U256};
 use crate::{ExitError, ExitReason, ExitSucceed, Opcode};
@@ -10,6 +9,25 @@ use parity_scale_codec::{Decode, Encode};
 pub struct Stack {
 	pub data: Vec<H256>,
 	pub limit: u64,
+}
+
+#[derive(Clone, Debug, Encode, Decode, PartialEq, Eq)]
+pub struct Context {
+	/// Execution address.
+	pub address: H160,
+	/// Caller of the EVM.
+	pub caller: H160,
+	/// Apparent value of the EVM.
+	pub apparent_value: U256,
+}
+impl From<evm_runtime::Context> for Context {
+	fn from(i: evm_runtime::Context) -> Self {
+		Self {
+			address: i.address,
+			caller: i.caller,
+			apparent_value: i.apparent_value,
+		}
+	}
 }
 
 impl From<&crate::Stack> for Stack {
