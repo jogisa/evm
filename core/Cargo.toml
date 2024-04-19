@@ -26,7 +26,6 @@ std = [
 	"scale-info/std",
 ]
 with-codec = [
-	"scale-codec",
 	"scale-info",
 	"primitive-types/impl-codec",
 ]
