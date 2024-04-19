@@ -10,7 +10,7 @@ edition = "2018"
 
 [dependencies]
 primitive-types = { version = "0.12", default-features = false }
-scale-codec = { package = "parity-scale-codec", version = "3.2", default-features = false, features = ["derive", "full"], optional = true }
+parity-scale-codec = { version = "3.6.4", default-features = false, features = ["derive"] }
 scale-info = { version = "2.3", default-features = false, features = ["derive"], optional = true }
 serde = { version = "1.0", default-features = false, features = ["derive"], optional = true }
 
@@ -22,7 +22,7 @@ default = ["std"]
 std = [
 	"primitive-types/std",
 	"serde/std",
-	"scale-codec/std",
+	"parity-scale-codec/std",
 	"scale-info/std",
 ]
 with-codec = [
