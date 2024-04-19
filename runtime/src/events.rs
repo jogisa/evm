@@ -21,7 +21,7 @@ pub struct Context {
 	pub apparent_value: U256,
 }
 impl From<crate::Context> for Context {
-	fn from(i: evm_runtime::Context) -> Self {
+	fn from(i: crate::Context) -> Self {
 		Self {
 			address: i.address,
 			caller: i.caller,
