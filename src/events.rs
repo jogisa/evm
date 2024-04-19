@@ -3,7 +3,7 @@ extern crate alloc;
 use alloc::vec::Vec;
 use ethereum_types::{H160, H256, U256};
 use evm_runtime::ExitReason;
-use scale_codec::{Decode, Encode};
+use parity_scale_codec::{Decode, Encode};
 
 #[derive(Clone, Debug, Encode, Decode, PartialEq, Eq)]
 pub struct Transfer {
@@ -123,10 +123,10 @@ pub enum EvmEvent {
 }
 
 #[cfg(feature = "tracing")]
-impl<'a> From<crate::Event<'a>> for EvmEvent {
-	fn from(i: crate::Event<'a>) -> Self {
+impl<'a> From<crate::tracing::Event<'a>> for EvmEvent {
+	fn from(i: crate::tracing::Event<'a>) -> Self {
 		match i {
-			crate::Event::Call {
+			crate::tracing::Event::Call {
 				code_address,
 				transfer,
 				input,
@@ -145,7 +145,7 @@ impl<'a> From<crate::Event<'a>> for EvmEvent {
 				is_static,
 				context: context.clone().into(),
 			},
-			crate::Event::Create {
+			crate::tracing::Event::Create {
 				caller,
 				address,
 				scheme,
@@ -160,7 +160,7 @@ impl<'a> From<crate::Event<'a>> for EvmEvent {
 				init_code: init_code.to_vec(),
 				target_gas,
 			},
-			crate::Event::Suicide {
+			crate::tracing::Event::Suicide {
 				address,
 				target,
 				balance,
@@ -169,14 +169,14 @@ impl<'a> From<crate::Event<'a>> for EvmEvent {
 				target,
 				balance,
 			},
-			crate::Event::Exit {
+			crate::tracing::Event::Exit {
 				reason,
 				return_value,
 			} => Self::Exit {
 				reason: reason.clone(),
 				return_value: return_value.to_vec(),
 			},
-			crate::Event::TransactCall {
+			crate::tracing::Event::TransactCall {
 				caller,
 				address,
 				value,
@@ -189,7 +189,7 @@ impl<'a> From<crate::Event<'a>> for EvmEvent {
 				data: data.to_vec(),
 				gas_limit,
 			},
-			crate::Event::TransactCreate {
+			crate::tracing::Event::TransactCreate {
 				caller,
 				value,
 				init_code,
@@ -202,7 +202,7 @@ impl<'a> From<crate::Event<'a>> for EvmEvent {
 				gas_limit,
 				address,
 			},
-			crate::Event::TransactCreate2 {
+			crate::tracing::Event::TransactCreate2 {
 				caller,
 				value,
 				init_code,
@@ -217,7 +217,7 @@ impl<'a> From<crate::Event<'a>> for EvmEvent {
 				gas_limit,
 				address,
 			},
-			crate::Event::PrecompileSubcall {
+			crate::tracing::Event::PrecompileSubcall {
 				code_address,
 				transfer,
 				input,
