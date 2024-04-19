@@ -11,7 +11,7 @@ use primitive_types::{H160, H256, U256};
 #[derive(Clone, Eq, PartialEq, Debug, Default)]
 #[cfg_attr(
 	feature = "with-codec",
-	derive(scale_codec::Encode, scale_codec::Decode, scale_info::TypeInfo)
+	derive(parity_scale_codec::Encode, parity_scale_codec::Decode, scale_info::TypeInfo)
 )]
 #[cfg_attr(feature = "with-serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Basic {

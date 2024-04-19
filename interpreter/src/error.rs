@@ -34,7 +34,7 @@ pub type ExitResult = Result<ExitSucceed, ExitError>;
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(
 	feature = "with-codec",
-	derive(scale_codec::Encode, scale_codec::Decode, scale_info::TypeInfo)
+	derive(parity_scale_codec::Encode, parity_scale_codec::Decode, scale_info::TypeInfo)
 )]
 #[cfg_attr(feature = "with-serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum ExitError {
@@ -75,7 +75,7 @@ impl std::fmt::Display for ExitError {
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 #[cfg_attr(
 	feature = "with-codec",
-	derive(scale_codec::Encode, scale_codec::Decode, scale_info::TypeInfo)
+	derive(parity_scale_codec::Encode, parity_scale_codec::Decode, scale_info::TypeInfo)
 )]
 #[cfg_attr(feature = "with-serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum ExitSucceed {
@@ -97,7 +97,7 @@ impl From<ExitSucceed> for ExitResult {
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(
 	feature = "with-codec",
-	derive(scale_codec::Encode, scale_codec::Decode, scale_info::TypeInfo)
+	derive(parity_scale_codec::Encode, parity_scale_codec::Decode, scale_info::TypeInfo)
 )]
 #[cfg_attr(feature = "with-serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum ExitException {
@@ -176,7 +176,7 @@ impl From<ExitException> for ExitError {
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(
 	feature = "with-codec",
-	derive(scale_codec::Encode, scale_codec::Decode, scale_info::TypeInfo)
+	derive(parity_scale_codec::Encode, parity_scale_codec::Decode, scale_info::TypeInfo)
 )]
 #[cfg_attr(feature = "with-serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum ExitFatal {

@@ -71,7 +71,7 @@ pub enum EvmEvent {
 		input: Vec<u8>,
 		target_gas: Option<u64>,
 		is_static: bool,
-		context: super::Context,
+		context: evm_runtime::events::Context,
 	},
 	Create {
 		caller: H160,
