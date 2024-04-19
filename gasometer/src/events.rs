@@ -1,4 +1,4 @@
-use scale_codec::{Decode, Encode};
+use parity_scale_codec::{Decode, Encode};
 
 #[derive(Debug, Default, Copy, Clone, Encode, Decode, PartialEq, Eq)]
 pub struct Snapshot {
@@ -15,8 +15,8 @@ impl Snapshot {
 }
 
 #[cfg(feature = "tracing")]
-impl From<Option<evm_gasometer::Snapshot>> for Snapshot {
-	fn from(i: Option<evm_gasometer::Snapshot>) -> Self {
+impl From<Option<crate::Snapshot>> for Snapshot {
+	fn from(i: Option<crate::Snapshot>) -> Self {
 		if let Some(i) = i {
 			Self {
 				gas_limit: i.gas_limit,
@@ -57,26 +57,26 @@ pub enum GasometerEvent {
 }
 
 #[cfg(feature = "tracing")]
-impl From<crate::Event> for GasometerEvent {
-	fn from(i: crate::Event) -> Self {
+impl From<crate::tracing::Event> for GasometerEvent {
+	fn from(i: crate::tracing::Event) -> Self {
 		match i {
-			crate::Event::RecordCost { cost, snapshot } => Self::RecordCost {
+			crate::tracing::Event::RecordCost { cost, snapshot } => Self::RecordCost {
 				cost,
 				snapshot: snapshot.into(),
 			},
-			crate::Event::RecordRefund { refund, snapshot } => {
+			crate::tracing::Event::RecordRefund { refund, snapshot } => {
 				Self::RecordRefund {
 					refund,
 					snapshot: snapshot.into(),
 				}
 			}
-			crate::Event::RecordStipend { stipend, snapshot } => {
+			crate::tracing::Event::RecordStipend { stipend, snapshot } => {
 				Self::RecordStipend {
 					stipend,
 					snapshot: snapshot.into(),
 				}
 			}
-			crate::Event::RecordDynamicCost {
+			crate::tracing::Event::RecordDynamicCost {
 				gas_cost,
 				memory_gas,
 				gas_refund,
@@ -87,7 +87,7 @@ impl From<crate::Event> for GasometerEvent {
 				gas_refund,
 				snapshot: snapshot.into(),
 			},
-			crate::Event::RecordTransaction { cost, snapshot } => {
+			crate::tracing::Event::RecordTransaction { cost, snapshot } => {
 				Self::RecordTransaction {
 					cost,
 					snapshot: snapshot.into(),
