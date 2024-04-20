@@ -12,7 +12,7 @@ use crate::{
 use alloc::{collections::BTreeSet, rc::Rc, vec::Vec};
 use core::{cmp::min, convert::Infallible};
 use evm_core::ExitFatal;
-use evm_runtime::{Resolve};
+use evm_runtime::Resolve;
 use primitive_types::{H160, H256, U256};
 use sha3::{Digest, Keccak256};
 
