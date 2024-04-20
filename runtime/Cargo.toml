@@ -15,7 +15,7 @@ primitive-types = { version = "0.12", default-features = false }
 sha3 = { version = "0.10", default-features = false }
 
 parity-scale-codec = { version = "3.6.4", default-features = false, features = ["derive"] }
-evm-core = { version = "0.39", path = "../core", default-features = false }
+evm-core = { version = "0.39", path = "../core", default-features = false, features = ["with-codec"]}
 ethereum-types = { version = "0.14.1", default-features = false }
 
 [features]
