@@ -24,8 +24,9 @@ scale-info = { version = "2.3", default-features = false, features = ["derive"],
 serde = { version = "1.0", default-features = false, features = ["derive"], optional = true }
 
 evm-core = { version = "0.39", path = "core", default-features = false }
-evm-gasometer = { version = "0.39", path = "gasometer", default-features = false }
+evm-gasometer = { version = "0.39", path = "gasometer", default-features = false, features = ["tracing"] }
 evm-runtime = { version = "0.39", path = "runtime", default-features = false, features = ["tracing"]}
+# evm-tracer = { version = "0.1", path = "tracing", default-features = false }
 
 [dev-dependencies]
 criterion = "0.4"
