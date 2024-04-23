@@ -18,12 +18,9 @@ parity-scale-codec = { version = "3.6.4", default-features = false, features = [
 evm-core = { version = "0.39", path = "../core", default-features = false, features = ["with-codec"]}
 ethereum-types = { version = "0.14.1", default-features = false }
 
-sp-runtime-interface = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.9.0", default-features = false }
-
 [features]
 default = ["std"]
 std = [
-	"sp-runtime-interface/std",
 	"parity-scale-codec/std",
 	"environmental/std",
 	"primitive-types/std",
