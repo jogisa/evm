@@ -10,9 +10,6 @@ extern crate alloc;
 pub mod tracing;
 
 #[cfg(feature = "tracing")]
-pub mod events;
-
-#[cfg(feature = "tracing")]
 macro_rules! event {
 	($x:expr) => {
 		use crate::tracing::Event::*;
@@ -39,11 +36,6 @@ pub use crate::interrupt::{Resolve, ResolveCall, ResolveCreate};
 use alloc::rc::Rc;
 use alloc::vec::Vec;
 use primitive_types::{H160, U256};
-
-pub struct StepEventFilter {
-	pub enable_stack: bool,
-	pub enable_memory: bool,
-}
 
 macro_rules! step {
 	( $self:expr, $handler:expr, $return:tt $($err:path)?; $($ok:path)? ) => ({

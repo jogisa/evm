@@ -17,6 +17,9 @@ pub mod tracing;
 pub mod events;
 
 #[cfg(feature = "tracing")]
+pub mod runtime;
+
+#[cfg(feature = "tracing")]
 macro_rules! event {
 	($x:expr) => {
 		use crate::tracing::Event::*;
