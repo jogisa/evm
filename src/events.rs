@@ -4,7 +4,7 @@ use alloc::vec::Vec;
 use ethereum_types::{H160, H256, U256};
 use evm_runtime::ExitReason;
 use parity_scale_codec::{Decode, Encode};
-use evm_runtime::events::Context;
+use crate::runtime::Context;
 
 use sp_runtime_interface::pass_by::PassByCodec;
 environmental::environmental!(listener: dyn Listener + 'static);
@@ -86,7 +86,7 @@ pub struct StepEventFilter {
 pub enum Event {
 	Evm(EvmEvent),
 	Gasometer(evm_gasometer::events::GasometerEvent),
-	Runtime(evm_runtime::events::RuntimeEvent),
+	Runtime(crate::runtime::RuntimeEvent),
 	CallListNew(),
 }
 
