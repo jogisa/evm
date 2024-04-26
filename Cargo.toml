@@ -27,6 +27,7 @@ serde = { version = "1.0", default-features = false, features = ["derive"], opti
 evm-core = { version = "0.39", path = "core", default-features = false }
 evm-gasometer = { version = "0.39", path = "gasometer", default-features = false, features = ["tracing"] }
 evm-runtime = { version = "0.39", path = "runtime", default-features = false, features = ["tracing"]}
+sp-runtime-interface = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.9.0", default-features = false }
 # evm-tracer = { version = "0.1", path = "tracing", default-features = false }
 
 [dev-dependencies]
@@ -40,6 +41,7 @@ harness = false
 [features]
 default = ["std"]
 std = [
+	"sp-runtime-interface/std",
 	"environmental/std",
 	"ethereum/std",
 	"log/std",
