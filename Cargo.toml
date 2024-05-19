@@ -27,7 +27,7 @@ serde = { version = "1.0", default-features = false, features = ["derive"], opti
 evm-core = { version = "0.39", path = "core", default-features = false }
 evm-gasometer = { version = "0.39", path = "gasometer", default-features = false, features = ["tracing"] }
 evm-runtime = { version = "0.39", path = "runtime", default-features = false, features = ["tracing"]}
-sp-runtime-interface = { version = "17.0.0", git = "https://github.com/bifrost-platform/polkadot-sdk", branch = "bifrost-polkadot-v1.3.0", default-features = false }
+sp-runtime-interface = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0", default-features = false }
 # evm-tracer = { version = "0.1", path = "tracing", default-features = false }
 
 [dev-dependencies]
