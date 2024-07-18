@@ -3,7 +3,7 @@
 use evm_runtime::{CreateScheme, Context, ExitReason, Transfer};
 use primitive_types::{H160, H256, U256};
 
-// environmental::environmental!(listener: dyn EventListener + 'static);
+environmental::environmental!(listener: dyn EventListener + 'static);
 
 pub trait EventListener {
 	fn event(&mut self, event: Event<'_>);
